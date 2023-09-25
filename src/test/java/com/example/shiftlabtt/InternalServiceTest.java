@@ -17,13 +17,15 @@ class InternalServiceTest {
     @Autowired
     private IntervalService intervalService;
 
+    /**
+     * Добавление и получения минимального численного интервала без пересечений
+     */
     @Test
     @Transactional
-    void saveAndGetDigit() {
+    void saveAndGetDigitWithoutIntersection() {
         List<DigitsInterval> intervals = new ArrayList<>(List.of(
                 new DigitsInterval(1L, 10L),
-                new DigitsInterval(3L, 4L),
-                new DigitsInterval(4L, 7L),
+                new DigitsInterval(11L, 19L),
                 new DigitsInterval(20L, 23L)
         ));
         intervalService.mergeDigitInterval(intervals);
@@ -33,19 +35,57 @@ class InternalServiceTest {
         Assertions.assertEquals(minInterval.getEnd(), 23L);
     }
 
+    /**
+     * Добавление и получения минимального численного интервала с пересечением
+     */
     @Test
     @Transactional
-    void saveAndGetLetter() {
+    void saveAndGetDigitWithIntersection() {
+        List<DigitsInterval> intervals = new ArrayList<>(List.of(
+                new DigitsInterval(1L, 2L),
+                new DigitsInterval(10L, 23L),
+                new DigitsInterval(2L, 5L)
+        ));
+        intervalService.mergeDigitInterval(intervals);
+        DigitsInterval minInterval = intervalService.getMinDigitInterval();
+        Assertions.assertNotNull(minInterval);
+        Assertions.assertEquals(minInterval.getStart(), 1L);
+        Assertions.assertEquals(minInterval.getEnd(), 5L);
+    }
+
+    /**
+     * Добавление и получения минимального буквенного интервала без пересечений
+     */
+    @Test
+    @Transactional
+    void saveAndGetLetterWithoutIntersection() {
         List<LetterInterval> intervals = new ArrayList<>(List.of(
-                new LetterInterval('a', 'c'),
-                new LetterInterval('d', 'k'),
-                new LetterInterval('a', 'u'),
-                new LetterInterval('v', 'z')
+                new LetterInterval('a', 'g'),
+                new LetterInterval('h', 'n'),
+                new LetterInterval('o', 'r')
         ));
         intervalService.mergeLetterInterval(intervals);
         LetterInterval minInterval = intervalService.getMinLetterInterval();
         Assertions.assertNotNull(minInterval);
-        Assertions.assertEquals(minInterval.getStart(), 'v');
-        Assertions.assertEquals(minInterval.getEnd(), 'z');
+        Assertions.assertEquals(minInterval.getStart(), 'o');
+        Assertions.assertEquals(minInterval.getEnd(), 'r');
+    }
+
+    /**
+     * Добавление и получения минимального буквенного интервала с пересечением
+     */
+    @Test
+    @Transactional
+    void saveAndGetLetterWithIntersection() {
+        List<LetterInterval> intervals = new ArrayList<>(List.of(
+                new LetterInterval('a', 'c'),
+                new LetterInterval('h', 'n'),
+                new LetterInterval('c', 'e')
+        ));
+        intervalService.mergeLetterInterval(intervals);
+        LetterInterval minInterval = intervalService.getMinLetterInterval();
+        Assertions.assertNotNull(minInterval);
+        Assertions.assertEquals(minInterval.getStart(), 'a');
+        Assertions.assertEquals(minInterval.getEnd(), 'e');
     }
 }

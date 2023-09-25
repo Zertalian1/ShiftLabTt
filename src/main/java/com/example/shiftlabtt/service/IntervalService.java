@@ -17,6 +17,12 @@ public class IntervalService {
     private final LetterIntervalRepository letterIntervalRepository;
     private final DigitsIntervalRepository digitsIntervalRepository;
 
+    /**
+     * Алгоритм, пдеобразующий список интервалов, путём объединения персесекающихся интервалов в один
+     * @param intervals отсортированный список интервалов
+     * @return преобразованный список интервалов, тип списка соответствует изначальному типу
+     * @param <V> - класс, реализующий интерфейс Interval
+     */
     private <V extends Interval<V>> List<V> algorithm(List<V> intervals) {
         for (int i = 1; i < intervals.size(); i++) {
             if (intervals.get(i).intersect(intervals.get(i - 1))) {
@@ -28,6 +34,10 @@ public class IntervalService {
         return intervals;
     }
 
+    /**
+     * Сохранение численных интервалов с объединением пересекающихся
+     * @param intervals список интервалов
+     */
     public void mergeDigitInterval(List<DigitsInterval> intervals) {
         intervals.sort(Comparator.comparingLong(DigitsInterval::getStart));
         List<DigitsInterval> finalIntervals = algorithm(intervals);
@@ -39,6 +49,10 @@ public class IntervalService {
         }
     }
 
+    /**
+     * Сохранение буквенных интервалов с объединением пересекающихся
+     * @param intervals список интервалов
+     */
     public void mergeLetterInterval(List<LetterInterval> intervals) {
         intervals.sort(Comparator.comparing(LetterInterval::getStart));
         List<LetterInterval> finalIntervals = algorithm(intervals);
@@ -50,10 +64,18 @@ public class IntervalService {
         }
     }
 
+    /**
+     * Получение минимального численного интервала
+     * @return минимальный интервал
+     */
     public DigitsInterval getMinDigitInterval() {
         return digitsIntervalRepository.getDigitsIntervalByMinLength();
     }
 
+    /**
+     * Получение минимального буквенного интервала
+     * @return минимальный интервал
+     */
     public LetterInterval getMinLetterInterval() {
         return letterIntervalRepository.getLettersIntervalByMinLength();
     }
